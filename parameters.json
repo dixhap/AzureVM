@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkResourceGroup": {
+            "value": "hcl-dev-network"
+        },
+        "virtualNetworkName": {
+            "value": "hcl-network-vnet"
+        },
+        "subnetName": {
+            "value": "private"
+        },
+        "VmSize": {
+            "value": "Standard_DS2_v2"
+        },
+        "publisher":{
+            "value": "MicrosoftVisualStudio"
+        },
+        "offer": {
+            "value": "Windows"
+        },
+        "sku": {
+            "value": "Windows-10-N-x64"
+        },
+        "version": {
+            "value": "latest"
+        },
+        "virtualMachineName": {
+            "value": "test-dev-hcl-vm1"
+        },
+        "adminUsername": {
+            "value": "deeksha"
+        },
+        "adminPassword": {
+
+              "value": "deeksha123##"
+        },
+        "storageAccountName":{
+              "value" : "hcldevstg"
+            },
+        "networkInterfaces_name": {
+            "value": "test-dev-hcl-rg-nic1"
+        },
+        "privateIPAddress": {
+            "value": "10.3.2.14"
+        },
+        "privateIPAddressAllocationMethod": {
+            "value": "static"
+        },
+        "location": {
+            "value": "SouthCentralUS"
+        }
+    }
+}

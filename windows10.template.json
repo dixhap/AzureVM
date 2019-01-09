@@ -1,0 +1,122 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkResourceGroup": {
+            "type": "String"
+        },
+        "virtualNetworkName": {
+            "type": "String"
+        },
+        "subnetName": {
+            "type": "String"
+        },
+        "VmSize": {
+            "type": "String"
+        },
+        "publisher": {
+            "type": "String"
+        },
+        "offer": {
+            "type": "String"
+        },
+        "sku": {
+            "type": "String"
+        },
+        "version": {
+            "type": "String"
+        },
+        "virtualMachineName": {
+            "type": "String"
+        },
+        "adminUsername": {
+            "type": "String"
+        },
+        "adminPassword": {
+            "type": "SecureString"
+        },
+        "storageAccountName":{
+          "type" : "String"
+        },
+        "networkInterfaces_name": {
+            "type": "String"
+        },
+        "privateIPAddress": {
+            "type": "String"
+        },
+        "privateIPAddressAllocationMethod": {
+            "type": "String"
+        },
+        "location": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "vnetId": "[resourceId(parameters('virtualNetworkResourceGroup'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+    },
+    "resources": [{
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[parameters('virtualMachineName')]",
+        "apiVersion": "2016-04-30-preview",
+        "location": "[parameters('location')]",
+        "properties": {
+            "hardwareProfile": {
+                "vmSize": "[parameters('VmSize')]"
+            },
+            "storageProfile": {
+                "imageReference": {
+                    "publisher": "[parameters('publisher')]",
+                    "offer": "[parameters('offer')]",
+                    "sku": "[parameters('sku')]",
+                    "version": "[parameters('version')]"
+                },
+                "osDisk": {
+                    "createOption": "fromImage",
+                    "vhd": {
+                        "uri": "[concat(concat(reference(resourceId('test-dev-hcl-rg', 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2015-06-15').primaryEndpoints['blob'], 'vhds/'), parameters('virtualMachineName'), '.vhd')]"
+                    },
+                    "name": "[parameters('virtualMachineName')]"
+                },
+                "dataDisks": []
+            },
+            "osProfile": {
+                "computerName": "[parameters('virtualMachineName')]",
+                "adminUsername": "[parameters('adminUsername')]",
+                "adminPassword": "[parameters('adminPassword')]",
+                "windowsConfiguration": {
+                    "provisionVmAgent": "true"
+                }
+            },
+            "networkProfile": {
+                "networkInterfaces": [{
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_name'))]"
+                }]
+}
+        },
+        "dependsOn": [
+            "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_name'))]"
+]
+      },{"type": "Microsoft.Network/networkInterfaces",
+        "name": "[parameters('networkInterfaces_name')]",
+        "apiVersion": "2016-03-30",
+        "location": "[parameters('location')]",
+        "properties": {
+            "ipConfigurations": [{
+                "name": "ipconfig1",
+                "properties": {
+                    "privateIPAddress": "[parameters('privateIPAddress')]",
+                    "privateIPAllocationMethod": "[parameters('privateIPAddressAllocationMethod')]",
+                    "subnet": {
+                        "id": "[variables('subnetRef')]"
+                    }
+                }
+            }],
+            "dnsSettings": {
+                "dnsServers": []
+            },
+            "enableIPForwarding": false
+        }
+    }
+  ]
+}
